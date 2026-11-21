@@ -38,11 +38,34 @@ export async function getProfile(userId: string): Promise<ProfileRow | null> {
 
   try {
     const supabase = await createSupabaseServerClient();
-    const { data } = await supabase
+    let { data } = await supabase
       .from("profiles")
       .select("*")
       .eq("id", userId)
       .maybeSingle();
+
+    if (!data) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user && user.id === userId) {
+        const { data: newProfile } = await supabase
+          .from("profiles")
+          .upsert(
+            {
+              id: user.id,
+              full_name: (user.user_metadata?.full_name as string) || "",
+              business_name: (user.user_metadata?.business_name as string) || "",
+            },
+            { onConflict: "id" },
+          )
+          .select("*")
+          .maybeSingle();
+
+        data = newProfile;
+      }
+    }
 
     return data;
   } catch {

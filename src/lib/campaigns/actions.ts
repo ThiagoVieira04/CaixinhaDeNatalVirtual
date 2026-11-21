@@ -146,6 +146,17 @@ export async function createCampaignAction(
   if ("error" in input) return { error: input.error };
 
   const supabase = await createSupabaseServerClient();
+
+  // Garante que o perfil do comerciante existe para satisfazer a chave estrangeira
+  await supabase.from("profiles").upsert(
+    {
+      id: user.id,
+      full_name: (user.user_metadata?.full_name as string) || "",
+      business_name: (user.user_metadata?.business_name as string) || "",
+    },
+    { onConflict: "id" },
+  );
+
   const slug = await uniqueSlug(slugify(input.title));
 
   const { data, error } = await supabase
@@ -167,8 +178,11 @@ export async function createCampaignAction(
     .single();
 
   if (error || !data) {
+    console.error("Erro ao criar caixinha no Supabase:", error);
     return {
-      error: "Não foi possível criar a caixinha. Tente novamente.",
+      error:
+        error?.message ||
+        "Não foi possível criar a caixinha. Verifique se todos os campos do PIX foram preenchidos.",
     };
   }
 

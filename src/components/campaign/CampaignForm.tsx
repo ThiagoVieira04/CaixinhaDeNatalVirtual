@@ -40,8 +40,26 @@ export function CampaignForm({
   );
 
   return (
-    <form action={formAction} className="campaign-form">
+    <form action={formAction} method="post" className="campaign-form">
       {campaign ? <input type="hidden" name="id" value={campaign.id} /> : null}
+
+      {state.error ? (
+        <div
+          role="alert"
+          style={{
+            padding: "12px 16px",
+            background: "#fef2f2",
+            border: "1px solid #f87171",
+            borderRadius: "10px",
+            color: "#991b1b",
+            fontSize: "14px",
+            fontWeight: "600",
+            marginBottom: "12px",
+          }}
+        >
+          {state.error}
+        </div>
+      ) : null}
 
       <div className="field">
         <label htmlFor="title">Título da caixinha</label>
@@ -107,7 +125,9 @@ export function CampaignForm({
         <legend>Recebimento via PIX</legend>
 
         <div className="field">
-          <label htmlFor="pix_key">Chave PIX</label>
+          <label htmlFor="pix_key">
+            Chave PIX {status === "active" ? <span style={{ color: "#b91c1c" }}>*</span> : null}
+          </label>
           <input
             id="pix_key"
             name="pix_key"
@@ -116,6 +136,7 @@ export function CampaignForm({
             maxLength={120}
             defaultValue={campaign?.pix_key ?? ""}
             placeholder="e-mail, telefone, CPF/CNPJ ou chave aleatória"
+            required={status === "active"}
           />
         </div>
 
@@ -136,7 +157,9 @@ export function CampaignForm({
           </div>
 
           <div className="field">
-            <label htmlFor="city">Cidade do recebedor</label>
+            <label htmlFor="city">
+              Cidade do recebedor {status === "active" ? <span style={{ color: "#b91c1c" }}>*</span> : null}
+            </label>
             <input
               id="city"
               name="city"
@@ -145,21 +168,25 @@ export function CampaignForm({
               maxLength={15}
               defaultValue={campaign?.city ?? ""}
               placeholder="Sua cidade"
+              required={status === "active"}
             />
           </div>
         </div>
 
         <div className="form-row">
           <div className="field">
-            <label htmlFor="bank_code">Banco</label>
+            <label htmlFor="bank_code">
+              Banco {status === "active" ? <span style={{ color: "#b91c1c" }}>*</span> : null}
+            </label>
             <select
               id="bank_code"
               name="bank_code"
               className="input"
               value={bankCode}
               onChange={(event) => setBankCode(event.target.value)}
+              required={status === "active"}
             >
-              <option value="">Selecione</option>
+              <option value="">Selecione o banco</option>
               {BANKS.map((bank) => (
                 <option key={bank.code} value={bank.code}>
                   {bank.name}
