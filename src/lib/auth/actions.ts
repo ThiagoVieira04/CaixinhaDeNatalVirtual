@@ -93,7 +93,11 @@ export async function signUpAction(
     return { error: "A senha precisa ter pelo menos 6 caracteres." };
   }
 
-  const origin = (await headers()).get("origin") ?? getAppUrl();
+  // Prioriza NEXT_PUBLIC_APP_URL (URL da Vercel) para que o link no email
+  // aponte para o site em produção, não para localhost.
+  const appUrl = getAppUrl();
+  const headerOrigin = (await headers()).get("origin") ?? "";
+  const origin = appUrl && !appUrl.includes("localhost") ? appUrl : (headerOrigin || appUrl);
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -135,10 +139,15 @@ export async function requestPasswordResetAction(
     return { error: "Informe um e-mail válido." };
   }
 
-  const origin = (await headers()).get("origin") ?? getAppUrl();
+  // Usa a URL de produção (Vercel) para que o link no email funcione fora do localhost.
+  const appUrl = getAppUrl();
+  const headerOrigin = (await headers()).get("origin") ?? "";
+  const origin = appUrl && !appUrl.includes("localhost") ? appUrl : (headerOrigin || appUrl);
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/redefinir-senha`,
+    // O Supabase envia o token como hash fragment (#access_token=...&type=recovery).
+    // A rota /auth/confirmar (client-side) processa o hash e redireciona para /redefinir-senha.
+    redirectTo: `${origin}/auth/confirmar`,
   });
 
   if (error && error.message.toLowerCase().includes("rate limit")) {
