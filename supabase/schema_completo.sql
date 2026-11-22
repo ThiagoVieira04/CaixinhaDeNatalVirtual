@@ -270,6 +270,7 @@ declare
   target public.campaigns%rowtype;
   new_id uuid;
   pending_recent integer;
+  trimmed_donor_name text := trim(coalesce(p_donor_name, ''));
 begin
   select * into target
   from public.campaigns
@@ -283,7 +284,11 @@ begin
     raise exception 'Valor de contribuicao invalido.';
   end if;
 
-  if length(coalesce(p_donor_name, '')) > 80 then
+  if length(trimmed_donor_name) = 0 then
+    raise exception 'Informe o nome do contribuinte.';
+  end if;
+
+  if length(trimmed_donor_name) > 80 then
     raise exception 'Nome do contribuinte muito longo.';
   end if;
 
@@ -313,7 +318,7 @@ begin
     target.id,
     target.merchant_id,
     p_amount_cents,
-    nullif(trim(coalesce(p_donor_name, '')), ''),
+    trimmed_donor_name,
     nullif(trim(coalesce(p_note, '')), ''),
     'pending'
   )

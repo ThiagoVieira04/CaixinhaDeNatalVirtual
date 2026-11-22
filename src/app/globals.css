@@ -2317,6 +2317,46 @@ div.field-error {
   border-radius: 14px;
 }
 
+.contribution-success-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  padding: 24px 20px;
+  color: #154c2d;
+  background: linear-gradient(180deg, #edf7f0 0%, #e2f2e7 100%);
+  border: 1.5px solid #bce1c7;
+  border-radius: 18px;
+  box-shadow: 0 10px 24px rgba(21, 76, 45, 0.08);
+}
+
+.celebration-badge {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.contribution-success-box strong {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  color: #0c3b2b;
+}
+
+.contribution-success-box p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #2b543d;
+}
+
+.contribution-success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  margin-top: 8px;
+}
+
 .contribution-success strong {
   display: block;
   margin-bottom: 6px;

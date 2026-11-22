@@ -77,6 +77,9 @@ export function PublicContributeSection({
 
       <section className="public-card">
         <h2>Registrar contribuição</h2>
+        <p className="field-hint">
+          Sem cadastro: preencha seu nome e o valor da contribuição.
+        </p>
         <ContributionForm
           slug={slug}
           amount={amount}

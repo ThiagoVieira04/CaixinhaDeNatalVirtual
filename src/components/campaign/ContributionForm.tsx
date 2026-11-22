@@ -5,6 +5,7 @@ import {
   registerContributionAction,
   type ContributionFormState,
 } from "@/lib/donations/actions";
+import { WhatsAppIcon } from "@/components/icons";
 
 const initialState: ContributionFormState = {};
 
@@ -52,10 +53,36 @@ export function ContributionForm({
   };
 
   if (state.message) {
+    const shareText = encodeURIComponent(
+      `Acabei de contribuir para a caixinha de Natal! 🎄✨ Contribua você também:\n${typeof window !== "undefined" ? window.location.href : ""}`
+    );
+    const whatsappUrl = `https://api.whatsapp.com/send?text=${shareText}`;
+
     return (
-      <div className="contribution-success" role="status">
-        <strong>Obrigado por contribuir!</strong>
+      <div className="contribution-success-box" role="status">
+        <div className="celebration-badge">🎉 🎁 ✨</div>
+        <strong>Obrigado por apoiar!</strong>
         <p>{state.message}</p>
+
+        <div className="contribution-success-actions">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-whatsapp btn-block"
+          >
+            <WhatsAppIcon />
+            Compartilhar no WhatsApp
+          </a>
+
+          <button
+            type="button"
+            className="btn btn-outline btn-block btn-small"
+            onClick={() => window.location.reload()}
+          >
+            Fazer outra contribuição
+          </button>
+        </div>
       </div>
     );
   }
@@ -111,7 +138,7 @@ export function ContributionForm({
       </div>
 
       <div className="field">
-        <label htmlFor="donor_name">Seu nome (opcional)</label>
+        <label htmlFor="donor_name">Seu nome</label>
         <input
           id="donor_name"
           name="donor_name"
@@ -119,7 +146,13 @@ export function ContributionForm({
           className="input"
           maxLength={80}
           placeholder="Como você quer aparecer"
+          autoComplete="name"
+          required
+          aria-required="true"
         />
+        <span className="field-hint">
+          Não é preciso criar conta. Basta informar seu nome.
+        </span>
       </div>
 
       <div className="field">

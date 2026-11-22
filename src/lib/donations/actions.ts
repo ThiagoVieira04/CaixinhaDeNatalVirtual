@@ -39,6 +39,9 @@ export async function registerContributionAction(
   if (amountCents === null) {
     return { error: "Informe um valor válido, como 25,00." };
   }
+  if (!donorName) {
+    return { error: "Informe seu nome para registrar a contribuição." };
+  }
   if (!confirmedPix) {
     return { error: "Confirme que você já fez o PIX antes de registrar." };
   }

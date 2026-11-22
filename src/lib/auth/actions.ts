@@ -121,6 +121,77 @@ export async function signUpAction(
   };
 }
 
+export async function requestPasswordResetAction(
+  _previousState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  if (!isSupabaseConfigured()) {
+    return { error: "Supabase não configurado neste ambiente." };
+  }
+
+  const email = text(formData, "email").toLowerCase();
+
+  if (!email || !email.includes("@")) {
+    return { error: "Informe um e-mail válido." };
+  }
+
+  const origin = (await headers()).get("origin") ?? getAppUrl();
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/redefinir-senha`,
+  });
+
+  if (error && error.message.toLowerCase().includes("rate limit")) {
+    return {
+      error: "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+    };
+  }
+
+  return {
+    message:
+      "Se este e-mail estiver cadastrado, enviaremos um link para redefinir a senha.",
+  };
+}
+
+export async function updatePasswordAction(
+  _previousState: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  if (!isSupabaseConfigured()) {
+    return { error: "Supabase não configurado neste ambiente." };
+  }
+
+  const password = String(formData.get("password") ?? "");
+  const confirmation = String(formData.get("password_confirmation") ?? "");
+
+  if (password.length < 6) {
+    return { error: "A senha precisa ter pelo menos 6 caracteres." };
+  }
+  if (password !== confirmation) {
+    return { error: "As senhas não coincidem." };
+  }
+
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      error:
+        "Link inválido ou expirado. Solicite uma nova recuperação de senha.",
+    };
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    return { error: translateAuthError(error.message) };
+  }
+
+  redirect("/");
+}
+
 export async function signOutAction(): Promise<void> {
   if (isSupabaseConfigured()) {
     const supabase = await createSupabaseServerClient();

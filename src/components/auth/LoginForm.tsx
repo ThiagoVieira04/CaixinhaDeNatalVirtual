@@ -52,6 +52,10 @@ export function LoginForm({ next }: { next: string }) {
         </p>
       ) : null}
 
+      <p className="auth-switch">
+        <Link href="/esqueci-senha">Esqueci minha senha</Link>
+      </p>
+
       <button type="submit" className="btn btn-gold btn-block" disabled={isPending}>
         {isPending ? "Entrando…" : "Entrar"}
       </button>

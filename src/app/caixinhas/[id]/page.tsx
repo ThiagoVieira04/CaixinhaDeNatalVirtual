@@ -5,7 +5,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { StudioHeader } from "@/components/StudioHeader";
 import { CampaignForm } from "@/components/campaign/CampaignForm";
 import { CopyLinkButton } from "@/components/campaign/CopyLinkButton";
-import { ArrowRightIcon, CheckIcon, TrashIcon } from "@/components/icons";
+import { ArrowRightIcon, CheckIcon, TrashIcon, WhatsAppIcon } from "@/components/icons";
+import { ManualDonationForm } from "@/components/campaign/ManualDonationForm";
 import { getCurrentUser } from "@/lib/auth/user";
 import { isSupabaseConfigured, publicCampaignUrl } from "@/lib/supabase/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -111,6 +112,17 @@ export default async function ManageCampaignPage({
           </div>
           <div className="manage-head-actions">
             <CopyLinkButton url={publicUrl} />
+            <a
+              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                `Ajude nossa equipe na nossa Caixinha de Natal! 🎄✨ Contribua pelo PIX:\n${publicUrl}`,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-small btn-whatsapp"
+            >
+              <WhatsAppIcon />
+              Divulgar no WhatsApp
+            </a>
             <Link
               href={`/c/${campaign.slug}`}
               className="btn btn-small btn-gold"
@@ -212,62 +224,11 @@ export default async function ManageCampaignPage({
             <h2>Registrar contribuição manualmente</h2>
           </div>
           <p className="field-hint">
-            Use quando você receber o PIX e quiser confirmar a contribuição
+            Use quando você receber o PIX presencialmente ou em dinheiro e quiser confirmar a contribuição
             diretamente.
           </p>
 
-          <form action={addManualDonationAction} className="manual-form">
-            <input type="hidden" name="campaign_id" value={campaign.id} />
-            <div className="form-row">
-              <div className="field">
-                <label htmlFor="manual-amount">Valor (R$)</label>
-                <input
-                  id="manual-amount"
-                  name="amount"
-                  type="text"
-                  inputMode="decimal"
-                  className="input"
-                  placeholder="50,00"
-                  required
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="manual-name">Nome</label>
-                <input
-                  id="manual-name"
-                  name="donor_name"
-                  type="text"
-                  className="input"
-                  maxLength={80}
-                  placeholder="Opcional"
-                />
-              </div>
-              <div className="field">
-                <label htmlFor="manual-date">Data</label>
-                <input
-                  id="manual-date"
-                  name="donated_at"
-                  type="date"
-                  className="input"
-                  defaultValue={todayISODate()}
-                />
-              </div>
-            </div>
-            <div className="field">
-              <label htmlFor="manual-note">Mensagem</label>
-              <input
-                id="manual-note"
-                name="note"
-                type="text"
-                className="input"
-                maxLength={200}
-                placeholder="Opcional"
-              />
-            </div>
-            <button type="submit" className="btn btn-gold">
-              Registrar contribuição
-            </button>
-          </form>
+          <ManualDonationForm campaignId={campaign.id} />
         </section>
 
         <section className="panel manage-panel">
