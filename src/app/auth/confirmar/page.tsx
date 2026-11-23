@@ -10,13 +10,13 @@
  * para capturar e processar esses tokens antes de redirecionar o usuário.
  */
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { GiftIcon } from "@/components/icons";
 import Link from "next/link";
 
-export default function ConfirmarPage() {
+function ConfirmarContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"processando" | "erro">("processando");
@@ -134,5 +134,21 @@ export default function ConfirmarPage() {
         }
       `}</style>
     </main>
+  );
+}
+
+export default function ConfirmarPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="auth-page">
+          <section className="auth-card" style={{ textAlign: "center" }}>
+            <p className="auth-subtitle">Verificando link…</p>
+          </section>
+        </main>
+      }
+    >
+      <ConfirmarContent />
+    </Suspense>
   );
 }
