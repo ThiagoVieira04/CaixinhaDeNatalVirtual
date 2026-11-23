@@ -29,6 +29,13 @@ create policy "profiles_update_own"
   using (auth.uid() = id)
   with check (auth.uid() = id);
 
+-- Fallback do app: permite criar o próprio perfil caso o trigger não o tenha feito.
+drop policy if exists "profiles_insert_own" on public.profiles;
+create policy "profiles_insert_own"
+  on public.profiles for insert
+  to authenticated
+  with check (auth.uid() = id);
+
 -- Trigger para criar perfil automaticamente no cadastro
 create or replace function public.handle_new_user()
 returns trigger
@@ -219,6 +226,7 @@ select
   count(d.id) filter (where d.status = 'pending')::integer as pending_count
 from public.campaigns c
 left join public.donations d on d.campaign_id = c.id
+where c.merchant_id = auth.uid()
 group by c.id;
 
 revoke all on public.campaign_summaries from anon;
